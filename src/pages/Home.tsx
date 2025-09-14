@@ -1,32 +1,55 @@
-import React, { useEffect, useState } from 'react';
-import { getPokemons } from '../services/pokeApi';
-import PokemonCard from '../components/PokemonCard';
+import { useEffect, useMemo, useState } from "react";
+import PokemonCard from "../components/PokemonCard";
+import { getPokemonList } from "../services/pokeApi";
 
-const Home = () => {
-  const [pokemons, setPokemons] = useState([]);
+type Item = { id: number; name: string; imageUrl: string; types: string[] };
+
+export default function Home() {
+  const [items, setItems] = useState<Item[]>([]);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getPokemons();
-      setPokemons(data);
-    };
-    fetchData();
+    (async () => {
+      const list = await getPokemonList(151);
+      setItems(list);
+    })();
   }, []);
 
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q
+      ? items.filter(
+          (p) =>
+            p.name.toLowerCase().includes(q) || String(p.id).includes(q)
+        )
+      : items;
+  }, [items, query]);
+
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Lista de Pokémons</h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {pokemons.map((pokemon: any) => (
+    <>
+      <section className="hero">
+        <h1>Encontre todos os pokémons em um só lugar</h1>
+        <div className="search">
+          <input
+            placeholder="Digite o nome ou número do Pokémon..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+      </section>
+
+      {/* Cards */}
+      <section className="cards">
+        {filtered.map((p) => (
           <PokemonCard
-            key={pokemon.name}
-            name={pokemon.name}
-            image={pokemon.image}
+            key={p.id}
+            id={p.id}
+            name={p.name}
+            imageUrl={p.imageUrl}
+            types={p.types}
           />
         ))}
-      </div>
-    </div>
+      </section>
+    </>
   );
-};
-
-export default Home;
+}

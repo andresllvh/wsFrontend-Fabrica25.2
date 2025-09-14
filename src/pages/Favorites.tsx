@@ -1,12 +1,44 @@
-import React from 'react';
+import { useFavorites } from "../state/useFavorites";
+import { getPokemonDetails } from "../services/pokeApi";
+import { useEffect, useState } from "react";
+import PokemonCard from "../components/PokemonCard";
 
-const Favorites = () => {
+type Poke = { id: number; name: string; imageUrl: string; types: string[] };
+
+export default function Favorites() {
+  const { favorites } = useFavorites();
+  const [pokemons, setPokemons] = useState<Poke[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const list: Poke[] = [];
+      for (const id of favorites) {
+        const p = await getPokemonDetails(id);
+        list.push(p);
+      }
+      setPokemons(list);
+    })();
+  }, [favorites]);
+
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold">Pokémons Favoritos</h2>
-      <p>Lista dos Pokémons que você marcou como favoritos.</p>
-    </div>
-  );
-};
+    <main className="favorites">
+      <h1>Meus Favoritos</h1>
 
-export default Favorites;
+      {favorites.length === 0 ? (
+        <p>Você ainda não adicionou nenhum Pokémon aos favoritos.</p>
+      ) : (
+        <div className="cards">
+          {pokemons.map((p) => (
+            <PokemonCard
+              key={p.id}
+              id={p.id}
+              name={p.name}
+              imageUrl={p.imageUrl}
+              types={p.types}
+            />
+          ))}
+        </div>
+      )}
+    </main>
+  );
+}
