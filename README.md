@@ -28,7 +28,7 @@ O objetivo foi construir uma Pokédex interativa, responsiva e com funcionalidad
 
 ## 🌐 Deploy
 O projeto está publicado na Vercel:  
-👉 [Acessar aplicação](https://SEU-LINK-VERCEL.vercel.app)
+👉 [Acessar aplicação](https://ws-frontend-fabrica25-2-nine.vercel.app/)
 
 ---
 
